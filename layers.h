@@ -1,39 +1,31 @@
 #ifndef LAYERS_H
-#define LAYER_H
+#define LAYERS_H
 #include <activation.h>
 
-typedef struct {
+typedef struct Neuron {
     double *weights;
     double bias;
-    double *input;
+    double dz;
     double *dinput;
-    double *dweights;
-    double dbias;
-}Neuron;
+    int n_input;
+} Neuron;
 
-typedef struct {
+typedef struct LinearLayer {
     Neuron *neurons;
+    ActivationFunction activation;
     int n_input;
     int n_output;
-    ActivationFunction activation;
+    double learning_rate;
 } LinearLayer;
 
 double forward_neuron(Neuron *neuron, double *input);
-/* performs dot product given a neuron and some input data */
 
-double backward_neuron(Neuron *neuron, double *doutput);
-/* returns the gradient of the loss with respect to the given neuron */
+double backward_neuron(Neuron *neuron, double doutput, double learning_rate);
 
-LinearLayer create_layer(int n_input, int n_output);
-/* returns a linear layer at the given dimensions */
-
-void free_layer(LinearLayer *layer);
-/* free the allocated memory of the weights of the given layer */
+LinearLayer *create_layer(int n_input, int n_output, ActivationType type, double learning_rate);
 
 double *forward_layer(LinearLayer *layer, double *input);
-/* performs the forward_neuron function on every neuron of the given layer */
 
 double *backward_layer(LinearLayer *layer, double *doutput);
-/* performs the backward_neuron function on every neuron of the given layer */
 
 #endif

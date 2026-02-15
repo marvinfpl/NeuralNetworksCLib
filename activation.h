@@ -1,29 +1,30 @@
-#ifndef ACTIVATION_H
-#define ACTIVATION_H
+#ifndef ACTIVATION_C
+#define ACTIVATION_C
 
-#include <math.h>
-
-double relu_act(double input);
-/* performs relu function */
-
-double sigmoid_act(double input);
-/* performs sigmoid function */
-
-double tanh_act(double input);
-/* performs tanh function */
-
-typedef enum {
+typedef enum ActivationType {
     RELU,
-    SIGMOID,
     TANH,
+    SIGMOID,
 } ActivationType;
 
-typedef struct {
+typedef struct ActivationFunction {
     ActivationType type;
     double (*forward)(double);
+    double (*backward)(double);
 } ActivationFunction;
 
-ActivationFunction create_activation(ActivationType type); 
-/* returns an instance of the activation function given the type*/
+ActivationFunction *create_activation(ActivationType type);
+
+double forward_relu(double input);
+
+double backward_relu(double input);
+
+double forward_tanh(double input);
+
+double backward_tanh(double input);
+
+double forward_sigmoid(double input);
+
+double backward_sigmoid(double input);
 
 #endif
