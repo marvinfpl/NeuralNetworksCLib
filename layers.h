@@ -10,6 +10,16 @@ typedef struct Neuron {
     int n_input;
 } Neuron;
 
+/*
+typedef enum LayerType {
+    LINEAR,
+} LayerType;
+
+typedef struct Layer {
+
+} Layer;
+*/
+
 typedef struct LinearLayer {
     Neuron *neurons;
     ActivationFunction activation;
