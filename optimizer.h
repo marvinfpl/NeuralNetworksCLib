@@ -4,7 +4,6 @@
 
 typedef enum OptimizerType {
     GD,
-    SGD,
     MOMENTUM_SGD,
     ADAGRAD,
     RMSPROP,
@@ -12,27 +11,31 @@ typedef enum OptimizerType {
     ADAMW,
 } OptimizerType;
 
+typedef union OptimizerData {
+    GradientDescent *gd;
+    MomentumSDG *m;
+    Adagrad *ada;
+    RMSprop *rms;
+    Adam *a;
+} OptimizerData;
+
 typedef struct Optimizer {
-    OptimizerType Type;
-    void (*forward)(OptimizerType, Neuron*, double*, double);
+    OptimizerType type;
+    OptimizerData data;
+    void (*forward)(Optimizer*, Neuron*, double*, double);
 } Optimizer;
+
+Optimizer *init_optimizer(OptimizerType type, double learning_rate);
+
+void forward_optimizer(Optimizer*, Neuron*, double*, double);
 
 typedef struct GradientDescent {
     double learning_rate;
 } GradientDescent;
 
-GradientDescent init_GradientDescent();
+GradientDescent *init_GradientDescent(double learning_rate);
 
 void forward_GradientDescent(GradientDescent *gd, Neuron *neuron, double *dw, double dz);
-
-typedef struct StochasticGradientDescent {
-    double learning_rate;
-    int batch_size;
-} StochasticGradientDescent;
-
-StochasticGradientDescent init_StochasticGradientDescent();
-
-void forward_SGD(StochasticGradientDescent *sgd, Neuron *neuron, double *dw, double dz);
 
 typedef struct MomentumSDG {
     double learning_rate;
@@ -43,7 +46,7 @@ typedef struct MomentumSDG {
     double Beta_b;
 } MomentumSDG;
 
-MomentumSDG init_MomentumSGD();
+MomentumSDG *init_MomentumSGD(double learning_rate);
 
 void forward_MomentumSGD(MomentumSDG *m, Neuron *neuron, double *dw, double dz);
 
@@ -55,7 +58,7 @@ typedef struct Adagrad {
     double sqr_grad_b;
 } Adagrad;
 
-Adagrad init_Adagrad();
+Adagrad *init_Adagrad(double learning_rate);
 
 void forward_Adagrad(Adagrad *a, Neuron *neuron, double *dw, double dz);
 
@@ -69,7 +72,7 @@ typedef struct RMSprop {
     double beta_b;
 } RMSprop;
 
-RMSprop init_RMSprop();
+RMSprop *init_RMSprop(double learning_rate);
 
 void forward_RMSprop(RMSprop *r, Neuron *neuron ,double *dw, double dz);
 
@@ -85,7 +88,7 @@ typedef struct Adam {
     int step;
 } Adam;
 
-Adam init_Adam();
+Adam *init_Adam(double learning_rate);
 
 void forward_Adam(Adam *a, Neuron *neuron, double *dw, double dz);
 
