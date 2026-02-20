@@ -1,6 +1,7 @@
 #include <optimizer.h>
 #include <layers.h>
 #include <math.h>
+#include <stdio.h>
 
 Optimizer *init_optimizer(OptimizerType type, double learning_rate) {
     Optimizer *opt = malloc(sizeof(Optimizer));
