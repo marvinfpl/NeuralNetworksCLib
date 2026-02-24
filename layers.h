@@ -17,8 +17,15 @@ typedef enum LayerType {
     DROPOUT,
 } LayerType;
 
+typedef union LayerData {
+    LinearLayer *linear;
+    DropoutLayer *dropout;
+    ConvolutionalLayer *convo;
+} LayerData;
+
 typedef struct Layer {
-    LayerType Type;
+    LayerType type;
+    LayerData data;
 } Layer;
 
 typedef struct LinearLayer {
@@ -31,7 +38,7 @@ typedef struct LinearLayer {
 } LinearLayer;
 
 typedef struct DropoutLayer {
-    Neuron *neuron;
+    Neuron *neurons;
     ActivationFunction activation;
     int n_input;
     int n_output;
@@ -41,9 +48,11 @@ typedef struct DropoutLayer {
 } DropoutLayer;
 
 typedef struct ConvolutionalLayer {
-    Neuron *neuron;
+    Neuron *neurons;
+    ActivationFunction activation;
     int n_input;
     int n_output;
+    double learning_rate;
     Optimizer optimizer;
 } ConvolutionalLayer;
 
