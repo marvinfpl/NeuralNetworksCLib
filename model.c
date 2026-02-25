@@ -17,11 +17,11 @@ Model *init_Model(LayerType *type, Optimizer *optim, ActivationFunction *activat
         switch (type[i]) {
             case DROPOUT: {
                 DropoutLayer *layer = malloc(sizeof(DropoutLayer));
-                layer->activation = activations[i];
-                layer->learning_rate = learning_rate;
-                layer->n_input = n_input[i];
-                layer->n_output = n_output[i];
-                layer->optimizer = *optim;
+                layer->linear->activation = activations[i];
+                layer->linear->learning_rate = learning_rate;
+                layer->linear->n_input = n_input[i];
+                layer->linear->n_output = n_output[i];
+                layer->linear->optimizer = *optim;
                 l->data.dropout = layer;
                 layers[i] = l;
                 break;
@@ -69,15 +69,15 @@ void xavier(Layer *l) {
             }
             break;
         case DROPOUT:
-            double lowerBound = -sqrt(6.0 / (l->data.dropout->n_input + l->data.dropout->n_output));
-            double upperBound = sqrt(6.0 / (l->data.dropout->n_input + l->data.dropout->n_output));
-            for (int i = 0; i < l->data.dropout->n_output; i++) {
-                for (int j = 0; j < l->data.dropout->neurons[i].n_input; j++) {
+            double lowerBound = -sqrt(6.0 / (l->data.dropout->linear->n_input + l->data.dropout->linear->n_output));
+            double upperBound = sqrt(6.0 / (l->data.dropout->linear->n_input + l->data.dropout->linear->n_output));
+            for (int i = 0; i < l->data.dropout->linear->n_output; i++) {
+                for (int j = 0; j < l->data.dropout->linear->neurons[i].n_input; j++) {
                     double w_init = uniform_distribution(lowerBound, upperBound);
-                    l->data.dropout->neurons[i].weights[j] = w_init;
+                    l->data.dropout->linear->neurons[i].weights[j] = w_init;
                 }
                 double b_init = uniform_distribution(lowerBound, upperBound);
-                l->data.dropout->neurons[i].bias = b_init;
+                l->data.dropout->linear->neurons[i].bias = b_init;
             }
             break;
         case CONVOLUTIONAL:
@@ -122,6 +122,25 @@ void he(Layer *l) {
         case DROPOUT:
             break;
         case CONVOLUTIONAL:
+            break;
+    }
+}
+
+void orthogonal(Layer *l) {
+    switch(l->type) {
+        case LINEAR:
+            double **A = malloc(sizeof(double) * l->data.linear->n_input * l->data.linear->n_output);
+            for (int i = 0; i < l->data.linear->n_output; i++) {
+                double *w = sample_weights_from_gaussian(&l->data.linear->neurons[i], 0.0, 1.0);
+                A[i] = w;
+            }
+            double **W = malloc(sizeof(double) * l->data.linear->n_input * l->data.linear->n_output);
+            qr matrices = qr_decomposition(A);
+            /* handle the Q = Q * sign (diag R) stuff */
+            for (int i = 0; i < l->data.linear->n_output; i++) {
+                l->data.linear->neurons[i].weights = matrices.Q[i];
+            }
+            l->data.linear->neurons->bias = 0.0;
             break;
     }
 }

@@ -38,14 +38,16 @@ typedef struct LinearLayer {
 } LinearLayer;
 
 typedef struct DropoutLayer {
-    Neuron *neurons;
-    ActivationFunction activation;
-    int n_input;
-    int n_output;
-    double learning_rate;
-    double prob;
-    Optimizer optimizer;
+    LinearLayer *linear;
+    LinearLayer *masked;
+    double p;
 } DropoutLayer;
+
+void mask_layer(DropoutLayer *l);
+
+void mask_neuron(Neuron *n, double p);
+
+void reset_mask(DropoutLayer *l);
 
 typedef struct ConvolutionalLayer {
     Neuron *neurons;

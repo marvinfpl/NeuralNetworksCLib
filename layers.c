@@ -1,5 +1,6 @@
 #include <layers.h>
 #include <activation.h>
+#include <stdlib.h>
 
 double forward_neuron(Neuron *neuron, double *input) {
     neuron->dinput = input;
@@ -66,4 +67,22 @@ double *backward_layer(LinearLayer *layer, double *doutput) {
         free(neuron_dinput);
     }
     return dinput;
+}
+
+void mask_layer(DropoutLayer *l) {
+    for (int i = 0; i < l->linear->n_output; i++) {
+        for (int j = 0; j < l->masked->neurons[i].n_input; j++) {
+            if ((double)rand() / (double)RAND_MAX < l->p) {
+                l->masked->neurons[i].weights[j] = 0.0;
+            }
+        }
+    }
+}
+
+void reset_mask(DropoutLayer *l) {
+    for (int i = 0; i < l->linear->n_output; i++) {
+        for (int j = 0; j < l->masked->neurons[i].n_input; j++) {
+            l->masked->neurons[i].weights[j] = l->linear->neurons[i].weights[j];
+        }
+    }
 }
